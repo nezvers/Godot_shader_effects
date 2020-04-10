@@ -1,0 +1,63 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://Shaders/Pulsing.shader" type="Shader" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+[ext_resource path="res://Shaders/Float_simple.shader" type="Shader" id=3]
+[ext_resource path="res://Shaders/Float_with_rotation.shader" type="Shader" id=4]
+[ext_resource path="res://Shaders/Rotation.shader" type="Shader" id=5]
+[ext_resource path="res://Shaders/Wind.shader" type="Shader" id=6]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 1 )
+shader_param/speed = 1.0
+shader_param/amount = 0.3
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = ExtResource( 3 )
+shader_param/speed = 1.0
+shader_param/amount = 0.5
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = ExtResource( 5 )
+shader_param/speed = 1.0
+shader_param/amount = 0.3
+shader_param/direction = -1.0
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = ExtResource( 4 )
+shader_param/float_speed = 1.0
+shader_param/float_amount = 0.5
+shader_param/rotation_speed = 2.0
+shader_param/rotation_amount = 0.3
+shader_param/rotation_direction = -1.0
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = ExtResource( 6 )
+shader_param/wind_power = 0.3
+
+[node name="Level" type="Node2D"]
+
+[node name="Pulsing" type="Sprite" parent="."]
+material = SubResource( 1 )
+position = Vector2( 89, 88 )
+texture = ExtResource( 2 )
+
+[node name="Float_simple" type="Sprite" parent="."]
+material = SubResource( 2 )
+position = Vector2( 187, 90 )
+texture = ExtResource( 2 )
+
+[node name="Rotation" type="Sprite" parent="."]
+material = SubResource( 6 )
+position = Vector2( 282, 86 )
+texture = ExtResource( 2 )
+
+[node name="Float_with_rotation" type="Sprite" parent="."]
+material = SubResource( 7 )
+position = Vector2( 379, 87 )
+texture = ExtResource( 2 )
+
+[node name="Wind" type="Sprite" parent="."]
+material = SubResource( 8 )
+position = Vector2( 478, 84 )
+texture = ExtResource( 2 )
