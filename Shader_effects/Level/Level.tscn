@@ -1,29 +1,30 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
-[ext_resource path="res://Shaders/Pulsing.shader" type="Shader" id=1]
+[ext_resource path="res://Shaders/Node2D/Pulsing.shader" type="Shader" id=1]
 [ext_resource path="res://icon.png" type="Texture" id=2]
-[ext_resource path="res://Shaders/Float_simple.shader" type="Shader" id=3]
-[ext_resource path="res://Shaders/Float_with_rotation.shader" type="Shader" id=4]
-[ext_resource path="res://Shaders/Rotation.shader" type="Shader" id=5]
-[ext_resource path="res://Shaders/Wind.shader" type="Shader" id=6]
+[ext_resource path="res://Shaders/Node2D/Float_simple.shader" type="Shader" id=3]
+[ext_resource path="res://Shaders/Node2D/Float_with_rotation.shader" type="Shader" id=4]
+[ext_resource path="res://Shaders/Node2D/Rotation.shader" type="Shader" id=5]
+[ext_resource path="res://Shaders/Node2D/Wind.shader" type="Shader" id=6]
+[ext_resource path="res://Shaders/Control/Pulsing.shader" type="Shader" id=7]
 
-[sub_resource type="ShaderMaterial" id=1]
+[sub_resource type="ShaderMaterial" id=7]
 shader = ExtResource( 1 )
 shader_param/speed = 1.0
 shader_param/amount = 0.3
 
-[sub_resource type="ShaderMaterial" id=2]
+[sub_resource type="ShaderMaterial" id=8]
 shader = ExtResource( 3 )
 shader_param/speed = 1.0
 shader_param/amount = 0.5
 
-[sub_resource type="ShaderMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=9]
 shader = ExtResource( 5 )
 shader_param/speed = 1.0
 shader_param/amount = 0.3
 shader_param/direction = -1.0
 
-[sub_resource type="ShaderMaterial" id=4]
+[sub_resource type="ShaderMaterial" id=10]
 shader = ExtResource( 4 )
 shader_param/float_speed = 1.0
 shader_param/float_amount = 0.5
@@ -31,56 +32,101 @@ shader_param/rotation_speed = 2.0
 shader_param/rotation_amount = 0.3
 shader_param/rotation_direction = -1.0
 
-[sub_resource type="ShaderMaterial" id=5]
+[sub_resource type="ShaderMaterial" id=11]
 shader = ExtResource( 6 )
 shader_param/wind_power = 0.3
 shader_param/speed = 1.0
 
-[sub_resource type="Shader" id=6]
+[sub_resource type="Shader" id=14]
 code = "shader_type canvas_item;
 render_mode unshaded, blend_disabled;
 
-uniform float sway_power = 0.3;
+uniform float vertical_power = 0.3;
+uniform float horizontal_power = 0.3;
+uniform float speed = 1.0;
 
 const float PI = 3.14159265359;
 
 void vertex(){
-	float height_weight = sign(VERTEX.y)*0.5 - 0.5;
+	float height_weight;
+	//height_weight = sign(VERTEX.y)*0.5 - 0.5;// bottom fixed
+	height_weight = sign(VERTEX.y)*0.5 + 0.5;// bottom fixed
 	
+	float mult = sin(PI * 0.5 * TIME * speed);
+	
+	float y_length = abs(VERTEX.y);
+	VERTEX.y -= y_length * height_weight * vertical_power * abs(mult);
+	
+	float x_length = abs(VERTEX.x);
+	VERTEX.x += x_length * height_weight * horizontal_power * mult * sign(VERTEX.x);
 }"
 
-[sub_resource type="ShaderMaterial" id=7]
-shader = SubResource( 6 )
-shader_param/sway_power = 0.3
+[sub_resource type="ShaderMaterial" id=12]
+shader = SubResource( 14 )
+shader_param/vertical_power = 0.3
+shader_param/horizontal_power = 0.3
+shader_param/speed = 1.0
+
+[sub_resource type="ShaderMaterial" id=13]
+shader = ExtResource( 7 )
+shader_param/speed = 1.0
+shader_param/amount = 0.3
 
 [node name="Level" type="Node2D"]
 
-[node name="Pulsing" type="Sprite" parent="."]
-material = SubResource( 1 )
+[node name="Node2Ds" type="Node2D" parent="."]
+visible = false
+
+[node name="Pulsing" type="Sprite" parent="Node2Ds"]
+material = SubResource( 7 )
 position = Vector2( 89, 88 )
 texture = ExtResource( 2 )
 
-[node name="Float_simple" type="Sprite" parent="."]
-material = SubResource( 2 )
+[node name="Float_simple" type="Sprite" parent="Node2Ds"]
+material = SubResource( 8 )
 position = Vector2( 187, 90 )
 texture = ExtResource( 2 )
 
-[node name="Rotation" type="Sprite" parent="."]
-material = SubResource( 3 )
+[node name="Rotation" type="Sprite" parent="Node2Ds"]
+material = SubResource( 9 )
 position = Vector2( 282, 86 )
 texture = ExtResource( 2 )
 
-[node name="Float_with_rotation" type="Sprite" parent="."]
-material = SubResource( 4 )
+[node name="Float_with_rotation" type="Sprite" parent="Node2Ds"]
+material = SubResource( 10 )
 position = Vector2( 379, 87 )
 texture = ExtResource( 2 )
 
-[node name="Wind" type="Sprite" parent="."]
-material = SubResource( 5 )
+[node name="Wind" type="Sprite" parent="Node2Ds"]
+material = SubResource( 11 )
 position = Vector2( 478, 84 )
 texture = ExtResource( 2 )
 
-[node name="Sway" type="Sprite" parent="."]
-material = SubResource( 7 )
+[node name="Sway" type="Sprite" parent="Node2Ds"]
+material = SubResource( 12 )
 position = Vector2( 595, 86 )
 texture = ExtResource( 2 )
+
+[node name="Controls" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="Controls"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 15
+custom_constants/margin_top = 15
+custom_constants/margin_left = 15
+custom_constants/margin_bottom = 15
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Pulse" type="TextureRect" parent="Controls/MarginContainer"]
+material = SubResource( 13 )
+margin_left = 15.0
+margin_top = 15.0
+margin_right = 1009.0
+margin_bottom = 585.0
+texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
